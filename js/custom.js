@@ -74,7 +74,17 @@
      CONTACT -->
      =============================================== */
     jQuery(document).ready(function() {
-        $('#contactform').submit(function() {
+        $('#contactform').submit(function () {
+            if (googleAnalyticsId)
+                gtag('event', 'submit_form', {
+                    event_category: 'Contact Form',
+                    event_label: 'Form Submission',
+                })
+            if (facebookPixelId)
+                fbq('track', 'Lead', {
+                    content_name: 'Contact Form',
+                    content_category: 'Form Submission'
+                });
             var action = $(this).attr('action');
             $("#message").slideUp(750, function() {
                 $('#message').hide();

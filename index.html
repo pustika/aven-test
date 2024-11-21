@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
    <!-- Basic -->
-   
-<!-- Mirrored from html.design/demo/aven/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 17 Nov 2024 09:44:46 GMT -->
+<head>
 <meta charset="utf-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <!-- Mobile Metas -->
@@ -33,6 +32,36 @@
    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
    <![endif]-->
+   <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const facebookPixelId = urlParams.get('fbp');
+      const googleAnalyticsId = urlParams.get('ggl');
+   </script>
+   <!-- Facebook Pixel Code -->
+   <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+         if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+         n.queue=[];t=b.createElement(e);t.async=!0;
+         t.src=v;s=b.getElementsByTagName(e)[0];
+         s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+      if(facebookPixelId){
+         fbq('init', facebookPixelId);
+         fbq('track', 'PageView');
+      }
+   </script>
+   <!-- End Facebook Pixel Code -->
+   <!-- Google Tag Manager -->
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer', googleAnalyticsId);
+         function gtag(){dataLayer.push(arguments);}
+      </script>
+   <!-- End Google Tag Manager -->
    </head>
    <body class="realestate_version">
       <!-- LOADER -->
@@ -151,12 +180,12 @@
                   <i class="flaticon-house effect-1"></i>
                   <h4>Garage : 2</h4>
                </div>
-               <!-- end col -->  
+               <!-- end col -->
                <div class="col-md-2 col-sm-3 col-xs-6">
                   <i class="flaticon-full-bed effect-1"></i>
                   <h4>Bedrooms : 3</h4>
                </div>
-               <!-- end col -->  
+               <!-- end col -->
                <div class="col-md-2 col-sm-3 col-xs-6">
                   <i class="flaticon-swimming-pool effect-1"></i>
                   <h4>Pool : Yes</h4>
@@ -166,7 +195,7 @@
                   <i class="flaticon-calendar effect-1"></i>
                   <h4>Build in : 2015</h4>
                </div>
-               <!-- end col -->  
+               <!-- end col -->
             </div>
             <!-- end how-its-work -->
             <hr class="invis">
