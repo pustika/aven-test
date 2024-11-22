@@ -73,49 +73,63 @@
     /* ==============================================
      CONTACT -->
      =============================================== */
+    let userIp = '';
+
+    function getIP(apiUrl, callback) {
+        $.getJSON(apiUrl, function(data) {
+            userIp = data.ip;
+            callback();
+        }).fail(function() {
+            console.error('Error in obtaining an IP address.');
+            callback();
+        });
+    }
+
     jQuery(document).ready(function() {
-        $('#contactform').submit(function () {
-            if (googleAnalyticsId)
-                gtag('event', 'submit_form', {
-                    event_category: 'Contact Form',
-                    event_label: 'Form Submission',
-                })
-            if (facebookPixelId)
-                fbq('track', 'Lead', {
-                    content_name: 'Contact Form',
-                    content_category: 'Form Submission'
+        getIP('https://api.ipify.org?format=json', function() {
+            $('#contactform').submit(function () {
+                if (googleAnalyticsId)
+                    gtag('event', 'submit_form', {
+                        event_category: 'Contact Form',
+                        event_label: 'Form Submission',
+                    });
+                if (facebookPixelId)
+                    fbq('track', 'Lead', {
+                        content_name: 'Contact Form',
+                        content_category: 'Form Submission'
+                    });
+                var action = $(this).attr('action');
+                $("#message").slideUp(750, function() {
+                    $('#message').hide();
+                    $('#submit')
+                        .after('<img src="" class="loader" />')
+                        .attr('disabled', 'disabled');
+                    $.post(action, {
+                            first_name: $('#first_name').val(),
+                            last_name: $('#last_name').val(),
+                            email: $('#email').val(),
+                            phone: $('#phone').val(),
+                            select_service: $('#select_service').val(),
+                            select_price: $('#select_price').val(),
+                            comments: $('#comments').val(),
+                            verify: $('#verify').val(),
+                            user_ip: userIp
+                        },
+                        function(data) {
+                            document.getElementById('message').innerHTML = data['message'];
+                            $('#message').slideDown('slow');
+                            $('#contactform img.loader').fadeOut('slow', function() {
+                                $(this).remove()
+                            });
+                            $('#submit').removeAttr('disabled');
+                            if (data['success'] === true) $('#contactform').slideUp('slow');
+                        }
+                    );
                 });
-            var action = $(this).attr('action');
-            $("#message").slideUp(750, function() {
-                $('#message').hide();
-                $('#submit')
-                    .after('<img src="" class="loader" />')
-                    .attr('disabled', 'disabled');
-                $.post(action, {
-                        first_name: $('#first_name').val(),
-                        last_name: $('#last_name').val(),
-                        email: $('#email').val(),
-                        phone: $('#phone').val(),
-                        select_service: $('#select_service').val(),
-                        select_price: $('#select_price').val(),
-                        comments: $('#comments').val(),
-                        verify: $('#verify').val()
-                    },
-                    function(data) {
-                        document.getElementById('message').innerHTML = data['message'];
-                        $('#message').slideDown('slow');
-                        $('#contactform img.loader').fadeOut('slow', function() {
-                            $(this).remove()
-                        });
-                        $('#submit').removeAttr('disabled');
-                        if (data['success'] === true) $('#contactform').slideUp('slow');
-                    }
-                );
+                return false;
             });
-            return false;
         });
     });
-
     /* ==============================================
      CODE WRAPPER -->
      =============================================== */

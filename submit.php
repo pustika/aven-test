@@ -19,6 +19,20 @@ function logRequest($logFile, $data, $response)
     }
 }
 
+function getCountryByIP($ip) {
+    $url = "http://ip-api.com/json/{$ip}";
+    $response = file_get_contents($url);
+    if ($response === FALSE) {
+        error_log("Failed to retrieve country");
+        return "Failed to retrieve country";
+    }
+    $data = json_decode($response, true);
+    if ($data['status'] === 'fail') {
+        error_log("Failed to retrieve country". $data['message']);
+        return "Failed to retrieve country";
+    }
+    return $data['country'];
+}
 function sanitizeInput($data)
 {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
@@ -31,7 +45,8 @@ $fields = [
     'phone' => 'phone1',
     'select_service' => 'select_service1',
     'select_price' => 'select_price1',
-    'comments' => null
+    'comments' => null,
+    'user_ip' => null,
 ];
 
 $inputData = [];
@@ -53,6 +68,8 @@ $phone = $inputData['phone'];
 $service = $inputData['select_service'];
 $price = $inputData['select_price'];
 $comments = $inputData['comments'];
+$userIp = $inputData['user_ip'];
+$country = getCountryByIP($userIp);
 
 if (isset($_POST['first_name'])) {
     $response = [
