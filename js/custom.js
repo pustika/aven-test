@@ -102,13 +102,13 @@
                         verify: $('#verify').val()
                     },
                     function(data) {
-                        document.getElementById('message').innerHTML = data;
+                        document.getElementById('message').innerHTML = data['message'];
                         $('#message').slideDown('slow');
                         $('#contactform img.loader').fadeOut('slow', function() {
                             $(this).remove()
                         });
                         $('#submit').removeAttr('disabled');
-                        if (data.match('success') != null) $('#contactform').slideUp('slow');
+                        if (data['success'] === true) $('#contactform').slideUp('slow');
                     }
                 );
             });
