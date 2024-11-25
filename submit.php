@@ -1,11 +1,13 @@
 <?php
+require 'db.config.php';
+
 session_start();
 
 header('Content-Type: application/json; charset=utf-8');
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
-$logFile = __DIR__ . '/request_log.txt';;
-
+$logFile = __DIR__ . '/request_log.txt';
+$response = [];
 function logRequest($logFile, $data, $response)
 {
     $logEntry = [
@@ -19,7 +21,8 @@ function logRequest($logFile, $data, $response)
     }
 }
 
-function getCountryByIP($ip) {
+function getCountryByIP($ip)
+{
     $url = "http://ip-api.com/json/{$ip}";
     $response = file_get_contents($url);
     if ($response === FALSE) {
@@ -28,62 +31,73 @@ function getCountryByIP($ip) {
     }
     $data = json_decode($response, true);
     if ($data['status'] === 'fail') {
-        error_log("Failed to retrieve country". $data['message']);
+        error_log("Failed to retrieve country" . $data['message']);
         return "Failed to retrieve country";
     }
     return $data['country'];
 }
+
 function sanitizeInput($data)
 {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
 
-$fields = [
-    'first_name' => 'first_name1',
-    'last_name' => 'last_name1',
-    'email' => 'email1',
-    'phone' => 'phone1',
-    'select_service' => 'select_service1',
-    'select_price' => 'select_price1',
-    'comments' => null,
-    'user_ip' => null,
-];
+function insertInDb($firstName, $lastName, $email, $phone, $service, $price, $comments, $country, $ip)
+{
+    try {
+        global $db;
+        $query = "INSERT INTO leads (first_name, last_name, phone, email, selected_service, select_price, comments, user_ip, сountry) 
+                  VALUES (:first_name, :last_name, :phone, :email, :selected_service, :select_price, :comments, :user_ip, :country)";
+        $stmt = $db->prepare($query);
 
-$inputData = [];
+        $stmt->bindParam(':first_name', $firstName);
+        $stmt->bindParam(':last_name', $lastName);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':selected_service', $service);
+        $stmt->bindParam(':select_price', $price);
+        $stmt->bindParam(':comments', $comments);
+        $stmt->bindParam(':user_ip', $ip);
+        $stmt->bindParam(':country', $country);
 
-foreach ($fields as $key => $altKey) {
-    if (isset($_POST[$key])) {
-        $inputData[$key] = sanitizeInput($_POST[$key]);
-    } elseif ($altKey && isset($_POST[$altKey])) {
-        $inputData[$key] = sanitizeInput($_POST[$altKey]);
-    } else {
-        $inputData[$key] = '';
+        $stmt->execute();
+        return true;
+    } catch (PDOException $e) {
+        error_log("Error DB: " . $e->getMessage());
+        return false;
     }
 }
 
-$firstName = $inputData['first_name'];
-$lastName = $inputData['last_name'];
-$email = $inputData['email'];
-$phone = $inputData['phone'];
-$service = $inputData['select_service'];
-$price = $inputData['select_price'];
-$comments = $inputData['comments'];
-$userIp = $inputData['user_ip'];
-$country = getCountryByIP($userIp);
-
-if (isset($_POST['first_name'])) {
-    $response = [
-        'success' => true,
-        'redirect_url' => 'https://google.com/',
-        'message' => 'Data successfully processed!'
-    ];
-} else {
-    $response = [
-        'success' => false,
-        'redirect_url' => null,
-        'message' => 'Error: The data was not received or is incorrect.'
+function genResponse($isSuccess, $redirect_url, $message)
+{
+    return [
+        'success' => $isSuccess,
+        'redirect_url' => $redirect_url,
+        'message' => $message
     ];
 }
+
+$firstName = sanitizeInput($_POST['first_name']);
+$lastName = sanitizeInput($_POST['last_name']);
+$email = sanitizeInput($_POST['email']);
+$phone = sanitizeInput($_POST['phone']);
+$service = sanitizeInput($_POST['select_service']);
+$price = sanitizeInput($_POST['select_price']);
+$comments = sanitizeInput($_POST['comments']);
+$userIp = sanitizeInput($_POST['user_ip']);
+$country = getCountryByIP($userIp);
+
+
+if (isset($_POST['first_name'])) {
+    $isSuccess = insertInDb($firstName, $lastName, $email, $phone, $service, $price, $comments, $country, $userIp);
+
+    if ($isSuccess)
+        $response = genResponse(true, "google.com", "Data successfully processed!");
+     else
+        $response = genResponse(false, null, "Internal server error!");
+} else
+    $response = genResponse(false, null, "Error: The data was not received or is incorrect.");
+
 
 logRequest($logFile, $json, $response);
 
