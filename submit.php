@@ -77,6 +77,24 @@ function genResponse($isSuccess, $redirect_url, $message)
     ];
 }
 
+function validatePhoneNumber($phone) {
+    $phone = preg_replace('/[^\d+]/', '', $phone);
+
+    if (strpos($phone, '+') === 0) {
+        if (strlen($phone) < 8) {
+            return false;
+        }
+    } else {
+        if (strlen($phone) < 7) {
+            return false;
+        }
+    }
+    if (!preg_match('/^\+?\d+$/', $phone)) {
+        return false;
+    }
+    return true;
+}
+
 $firstName = sanitizeInput($_POST['first_name']);
 $lastName = sanitizeInput($_POST['last_name']);
 $email = sanitizeInput($_POST['email']);
@@ -87,16 +105,35 @@ $comments = sanitizeInput($_POST['comments']);
 $userIp = sanitizeInput($_POST['user_ip']);
 $country = getCountryByIP($userIp);
 
+if (!validatePhoneNumber($phone)) {
+    http_response_code(400);
+    exit(json_encode(genResponse(false, null, "Invalid phone number")));
+}
+if (strlen($firstName) <2 ) {
+    http_response_code(400);
+    exit(json_encode(genResponse(false, null, "first_name must be at least 2 characters")));
+}
+if (strlen($lastName) <2 ) {
+    http_response_code(400);
+    exit(json_encode(genResponse(false, null, "last_name must be at least 2 characters")));
+}
+if (strlen($service) === 0 ) {
+    http_response_code(400);
+    exit(json_encode(genResponse(false, null, "select_service must be at least 2 characters")));
+}
+if (strlen($price) === 0 ) {
+    http_response_code(400);
+    exit(json_encode(genResponse(false, null, "$price must be at least 2 characters")));
+}
 
-if (isset($_POST['first_name'])) {
     $isSuccess = insertInDb($firstName, $lastName, $email, $phone, $service, $price, $comments, $country, $userIp);
 
     if ($isSuccess)
         $response = genResponse(true, "google.com", "Data successfully processed!");
-     else
-        $response = genResponse(false, null, "Internal server error!");
-} else
-    $response = genResponse(false, null, "Error: The data was not received or is incorrect.");
+     else {
+         http_response_code(400);
+         exit(genResponse(false, null, "$price must be at least 2 characters"));
+     }
 
 
 logRequest($logFile, $json, $response);
