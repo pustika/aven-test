@@ -114,19 +114,19 @@ if (isset($_POST['form_token']) && $_POST['form_token'] === $_SESSION['csrf_toke
     }
     if (strlen($firstName) < 2) {
         http_response_code(400);
-        exit(json_encode(genResponse(false, null, "first_name must be at least 2 characters")));
+        exit(json_encode(genResponse(false, null, "First name must be at least 2 characters")));
     }
     if (strlen($lastName) < 2) {
         http_response_code(400);
-        exit(json_encode(genResponse(false, null, "last_name must be at least 2 characters")));
+        exit(json_encode(genResponse(false, null, "Last name must be at least 2 characters")));
     }
     if (strlen($service) === 0) {
         http_response_code(400);
-        exit(json_encode(genResponse(false, null, "select_service must be at least 2 characters")));
+        exit(json_encode(genResponse(false, null, "Select service must be not empty")));
     }
     if (strlen($price) === 0) {
         http_response_code(400);
-        exit(json_encode(genResponse(false, null, "$price must be at least 2 characters")));
+        exit(json_encode(genResponse(false, null, "Price must be not empty")));
     }
 
     $isSuccess = insertInDb($firstName, $lastName, $email, $phone, $service, $price, $comments, $country, $userIp);
@@ -134,8 +134,8 @@ if (isset($_POST['form_token']) && $_POST['form_token'] === $_SESSION['csrf_toke
     if ($isSuccess)
         $response = genResponse(true, "https://google.com", "Data successfully processed!");
     else {
-        http_response_code(400);
-        exit(genResponse(false, null, "$price must be at least 2 characters"));
+        http_response_code(500);
+        exit(genResponse(false, null, "Internal server error"));
     }
 
 
