@@ -328,6 +328,20 @@ const countries = [
      CONTACT -->
      =============================================== */
 
+    function setCsrfToken() {
+        $.ajax({
+            url: 'get_csrf.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#form_token').val(data.csrf_token);
+            },
+            error: function (xhr) {
+                $('#response').html('Error when receiving a token: ' + xhr.responseText);
+            }
+        });
+    }
+
     $('#phone').on('input', function() {
         $(this).val($(this).val().replace(/[^0-9+]/g, ''));
     });
@@ -364,7 +378,9 @@ const countries = [
             return false;
         }
     }
+
     jQuery(document).ready(function() {
+        setCsrfToken();
         var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         getIP('https://api.ipify.org?format=json', function() {
@@ -431,6 +447,7 @@ const countries = [
                                 select_price: $('#select_price').val(),
                                 comments: $('#comments').val(),
                                 verify: $('#verify').val(),
+                                form_token: $('#form_token').val(),
                                 user_ip: userIp
                             },
                             function (data) {

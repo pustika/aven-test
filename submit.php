@@ -95,36 +95,39 @@ function validatePhoneNumber($phone) {
     return true;
 }
 
-$firstName = sanitizeInput($_POST['first_name']);
-$lastName = sanitizeInput($_POST['last_name']);
-$email = sanitizeInput($_POST['email']);
-$phone = sanitizeInput($_POST['phone']);
-$service = sanitizeInput($_POST['select_service']);
-$price = sanitizeInput($_POST['select_price']);
-$comments = sanitizeInput($_POST['comments']);
-$userIp = sanitizeInput($_POST['user_ip']);
-$country = getCountryByIP($userIp);
 
-if (!validatePhoneNumber($phone)) {
-    http_response_code(400);
-    exit(json_encode(genResponse(false, null, "Invalid phone number")));
-}
-if (strlen($firstName) <2 ) {
-    http_response_code(400);
-    exit(json_encode(genResponse(false, null, "first_name must be at least 2 characters")));
-}
-if (strlen($lastName) <2 ) {
-    http_response_code(400);
-    exit(json_encode(genResponse(false, null, "last_name must be at least 2 characters")));
-}
-if (strlen($service) === 0 ) {
-    http_response_code(400);
-    exit(json_encode(genResponse(false, null, "select_service must be at least 2 characters")));
-}
-if (strlen($price) === 0 ) {
-    http_response_code(400);
-    exit(json_encode(genResponse(false, null, "$price must be at least 2 characters")));
-}
+if (isset($_POST['form_token']) && $_POST['form_token'] === $_SESSION['csrf_token']) {
+
+    $firstName = sanitizeInput($_POST['first_name']);
+    $lastName = sanitizeInput($_POST['last_name']);
+    $email = sanitizeInput($_POST['email']);
+    $phone = sanitizeInput($_POST['phone']);
+    $service = sanitizeInput($_POST['select_service']);
+    $price = sanitizeInput($_POST['select_price']);
+    $comments = sanitizeInput($_POST['comments']);
+    $userIp = sanitizeInput($_POST['user_ip']);
+    $country = getCountryByIP($userIp);
+
+    if (!validatePhoneNumber($phone)) {
+        http_response_code(400);
+        exit(json_encode(genResponse(false, null, "Invalid phone number")));
+    }
+    if (strlen($firstName) < 2) {
+        http_response_code(400);
+        exit(json_encode(genResponse(false, null, "first_name must be at least 2 characters")));
+    }
+    if (strlen($lastName) < 2) {
+        http_response_code(400);
+        exit(json_encode(genResponse(false, null, "last_name must be at least 2 characters")));
+    }
+    if (strlen($service) === 0) {
+        http_response_code(400);
+        exit(json_encode(genResponse(false, null, "select_service must be at least 2 characters")));
+    }
+    if (strlen($price) === 0) {
+        http_response_code(400);
+        exit(json_encode(genResponse(false, null, "$price must be at least 2 characters")));
+    }
 
     $isSuccess = insertInDb($firstName, $lastName, $email, $phone, $service, $price, $comments, $country, $userIp);
 
@@ -136,7 +139,13 @@ if (strlen($price) === 0 ) {
     }
 
 
-logRequest($logFile, $json, $response);
+    logRequest($logFile, $json, $response);
 
-echo json_encode($response);
+    echo json_encode($response);
+    unset($_SESSION['form_token']);
+
+} else {
+    http_response_code(403);
+    exit(json_encode(genResponse(false, null, "Invalid CSRF token")));
+}
 ?>
