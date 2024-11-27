@@ -32,6 +32,7 @@
    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
    <![endif]-->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/libphonenumber-js/1.9.36/libphonenumber-js.min.js"></script>
    <script>
       const urlParams = new URLSearchParams(window.location.search);
       const facebookPixelId = urlParams.get('fbp');
@@ -472,7 +473,7 @@
                               <input type="email" name="email" id="email" class="form-control" placeholder="Your Email">
                            </div>
                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                              <input type="text" name="phone" id="phone" class="form-control" placeholder="Your Phone">
+                              <input type="tel" name="phone" id="phone" class="form-control" placeholder="Your Phone">
                            </div>
                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                               <label class="sr-only">Select Time</label>
@@ -494,7 +495,7 @@
                               <textarea class="form-control" name="comments" id="comments" rows="6" placeholder="Give us more details.."></textarea>
                            </div>
                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
-                              <button type="submit" value="SEND" id="submit" class="btn btn-light btn-radius btn-brd grd1 btn-block">Get Appointment</button>
+                              <button  type="submit" value="SEND" id="submit" class="btn btn-light btn-radius btn-brd grd1 btn-block">Get Appointment</button>
                            </div>
                         </fieldset>
                      </form>
