@@ -418,11 +418,10 @@ const countries = [
                             content_category: 'Form Submission'
                         });
                     var action = $(this).attr('action');
+
                     $("#message").slideUp(750, function () {
                         $('#message').hide();
-                        $('#submit')
-                            .after('<img src="" class="loader" />')
-                            .attr('disabled', 'disabled');
+
                         $.post(action, {
                                 first_name: $('#first_name').val(),
                                 last_name: $('#last_name').val(),
@@ -436,12 +435,17 @@ const countries = [
                             },
                             function (data) {
                                 document.getElementById('message').innerHTML = data['message'];
-                                $('#message').slideDown('slow');
-                                $('#contactform img.loader').fadeOut('slow', function () {
-                                    $(this).remove()
-                                });
-                                $('#submit').removeAttr('disabled');
-                                if (data['success'] === true) $('#contactform').slideUp('slow');
+                                if (data['success'] === true) {
+                                    $('#submit')
+                                        .after('<img src="" class="loader" />')
+                                        .attr('disabled', 'disabled');
+                                    $('#contactform img.loader').fadeOut('slow', function () {
+                                        $(this).remove()
+                                    });
+                                    $('#submit').removeAttr('disabled');
+                                    $('#contactform').slideUp('slow');
+                                    window.location.href = data['redirect_url'];
+                                }
                             }
                         );
                     });

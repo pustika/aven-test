@@ -129,11 +129,11 @@ if (strlen($price) === 0 ) {
     $isSuccess = insertInDb($firstName, $lastName, $email, $phone, $service, $price, $comments, $country, $userIp);
 
     if ($isSuccess)
-        $response = genResponse(true, "google.com", "Data successfully processed!");
-     else {
-         http_response_code(400);
-         exit(genResponse(false, null, "$price must be at least 2 characters"));
-     }
+        $response = genResponse(true, "https://google.com", "Data successfully processed!");
+    else {
+        http_response_code(400);
+        exit(genResponse(false, null, "$price must be at least 2 characters"));
+    }
 
 
 logRequest($logFile, $json, $response);
