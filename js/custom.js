@@ -385,7 +385,7 @@ const countries = [
 
         getIP('https://api.ipify.org?format=json', function() {
             $('#contactform').submit(function (e) {
-
+                $("#error_message").hide();
                 var isError = false;
                 e.preventDefault();
                 if($('#first_name').val().length >= 1) {
@@ -452,6 +452,7 @@ const countries = [
                             },
                             function (data) {
                                 document.getElementById('message').innerHTML = data['message'];
+                                $('#message').show();
                                 if (data['success'] === true) {
                                     $('#submit')
                                         .after('<img src="" class="loader" />')
@@ -464,7 +465,13 @@ const countries = [
                                     window.location.href = data['redirect_url'];
                                 }
                             }
-                        );
+                        ).fail(function(response) {
+                            var errorResponse = JSON.parse(response.responseText);
+                            $("#error_message").text(errorResponse.message).show();
+                            if (errorResponse.redirect_url) {
+                                window.location.href = errorResponse.redirect_url;
+                            }
+                        });
                     });
                 }
                 return false;
