@@ -335,14 +335,19 @@ const countries = [
             dataType: 'json',
             success: function (data) {
                 $('#form_token').val(data.csrf_token);
+                $('#form_token1').val(data.csrf_token);
             },
             error: function (xhr) {
                 $('#response').html('Error when receiving a token: ' + xhr.responseText);
+                $('#response1').html('Error when receiving a token: ' + xhr.responseText);
             }
         });
     }
 
     $('#phone').on('input', function() {
+        $(this).val($(this).val().replace(/[^0-9+]/g, ''));
+    });
+    $('#phone1').on('input', function() {
         $(this).val($(this).val().replace(/[^0-9+]/g, ''));
     });
 
@@ -353,8 +358,10 @@ const countries = [
 
             if (country) {
                 $('#phone').val('+' + country.phone + ' ');
+                $('#phone1').val('+' + country.phone + ' ');
             } else {
                 $('#phone').val('1 ');
+                $('#phone1').val('1 ');
             }
         });
     });
@@ -382,45 +389,50 @@ const countries = [
     jQuery(document).ready(function() {
         setCsrfToken();
         var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        function sendData(postfix) {
+            $('#contactform'+ postfix).submit(function (e) {
 
-        getIP('https://api.ipify.org?format=json', function() {
-            $('#contactform').submit(function (e) {
-                $("#error_message").hide();
+                const first_name = $('#first_name' + postfix);
+                const last_name = $('#last_name' + postfix);
+                const email = $('#email' + postfix);
+                const phone = $('#phone' + postfix);
+                const select_service = $('#select_service' + postfix);
+                const select_price = $('#select_price' + postfix);
+                const comments = $('#comments');
+                const form_token = $('#form_token' + postfix);
+                const submit =  $('#submit' + postfix);
+                const contact_form =  $('#contactform' + postfix)
+                const error_message = $("#error_message" + postfix)
+                const message = $("#message" + postfix)
+                error_message.hide();
                 var isError = false;
                 e.preventDefault();
-                if($('#first_name').val().length >= 1) {
-                    $('#first_name').css('border', '1px solid #ebebeb');
+                if(first_name.val().length >= 1) {
+                    first_name.css('border', '1px solid #ebebeb');
                 } else {
                     isError = true;
-                    $('#first_name').css('border', '2px solid red');
+                    first_name.css('border', '2px solid red');
                 }
 
-                if($('#last_name').val().length >= 1) {
-                    $('#last_name').css('border', '1px solid #ebebeb');
+                if(last_name.val().length >= 1) {
+                    last_name.css('border', '1px solid #ebebeb');
                 } else {
                     isError = true;
-                    $('#last_name').css('border', '2px solid red');
+                    last_name.css('border', '2px solid red');
                 }
 
-                if(emailRegex.test($('#email').val())) {
-                    $('#email').css('border', '1px solid #ebebeb');
+                if(emailRegex.test(email.val())) {
+                    email.css('border', '1px solid #ebebeb');
                 } else {
                     isError = true;
-                    $('#email').css('border', '2px solid red');
+                    email.css('border', '2px solid red');
                 }
 
-                if(emailRegex.test($('#email').val())) {
-                    $('#email').css('border', '1px solid #ebebeb');
+                if (isValidPhoneNumber(phone.val())) {
+                    phone.css('border', '1px solid #ebebeb');
                 } else {
                     isError = true;
-                    $('#email').css('border', '2px solid red');
-                }
-
-                if (isValidPhoneNumber($('#phone').val())) {
-                    $('#phone').css('border', '1px solid #ebebeb');
-                } else {
-                    isError = true;
-                    $('#phone').css('border', '2px solid red');
+                    phone.css('border', '2px solid red');
                 }
                 if (!isError) {
                     if (googleAnalyticsId)
@@ -435,39 +447,36 @@ const countries = [
                         });
                     var action = $(this).attr('action');
 
-                    $("#message").slideUp(750, function () {
-                        $('#message').hide();
-
+                    message.slideUp(750, function () {
+                        message.hide();
                         $.post(action, {
-                                first_name: $('#first_name').val(),
-                                last_name: $('#last_name').val(),
-                                email: $('#email').val(),
-                                phone: $('#phone').val(),
-                                select_service: $('#select_service').val(),
-                                select_price: $('#select_price').val(),
-                                comments: $('#comments').val(),
-                                verify: $('#verify').val(),
-                                form_token: $('#form_token').val(),
+                                first_name: first_name.val(),
+                                last_name: last_name.val(),
+                                email: email.val(),
+                                phone: phone.val(),
+                                select_service: select_service.val(),
+                                select_price: select_price.val(),
+                                comments: comments.val(),
+                                form_token: form_token.val(),
                                 user_ip: userIp
                             },
                             function (data) {
-                                document.getElementById('message').innerHTML = data['message'];
-                                $('#message').show();
+                                document.getElementById('message'+ postfix).innerHTML = data['message'];
+                                message.show();
                                 if (data['success'] === true) {
-                                    $('#submit')
-                                        .after('<img src="" class="loader" />')
+                                    submit.after('<img src="" class="loader" />')
                                         .attr('disabled', 'disabled');
-                                    $('#contactform img.loader').fadeOut('slow', function () {
+                                    contact_form.fadeOut('slow', function () {
                                         $(this).remove()
                                     });
-                                    $('#submit').removeAttr('disabled');
-                                    $('#contactform').slideUp('slow');
+                                    submit.removeAttr('disabled');
+                                    contact_form.slideUp('slow');
                                     window.location.href = data['redirect_url'];
                                 }
                             }
                         ).fail(function(response) {
                             var errorResponse = JSON.parse(response.responseText);
-                            $("#error_message").text(errorResponse.message).show();
+                            error_message.text(errorResponse.message).show();
                             if (errorResponse.redirect_url) {
                                 window.location.href = errorResponse.redirect_url;
                             }
@@ -476,7 +485,9 @@ const countries = [
                 }
                 return false;
             });
-        });
+        }
+        getIP('https://api.ipify.org?format=json',() => sendData(""));
+        getIP('https://api.ipify.org?format=json',() => sendData( "1"));
     });
     /* ==============================================
      CODE WRAPPER -->

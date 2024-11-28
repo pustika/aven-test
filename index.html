@@ -112,8 +112,11 @@
                <div class="col-md-6 wow slideInRight hidden-xs hidden-sm">
                   <div class="contact_form">
                      <h3><i class="fa fa-envelope-o grd1 global-radius"></i> QUICK APPOINTMENT</h3>
-                     <form id="contactform1" class="row" name="contactform" method="post">
+                     <div id="message1"></div>
+                     <form id="contactform1" class="row" action="submit.php" name="contactform" method="post">
                         <fieldset class="row-fluid">
+                           <input type="hidden" name="form_token1" id="form_token1" value="">
+
                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                               <input type="text" name="first_name1" id="first_name1" class="form-control" placeholder="First Name">
                            </div>
@@ -143,6 +146,7 @@
                               </select>
                            </div>
                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                              <div id="error_message1" style="display: none;color: red"></div>
                               <button type="submit" value="SEND" id="submit1" class="btn btn-light btn-radius btn-brd grd1 btn-block">Get an Appointment</button>
                            </div>
                         </fieldset>
